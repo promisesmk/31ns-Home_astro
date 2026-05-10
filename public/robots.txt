@@ -2,3 +2,4 @@ User-agent: *
 Allow: /
 
 Sitemap: https://31ns.kr/sitemap-index.xml
+RSS: https://31ns.kr/rss.xml
