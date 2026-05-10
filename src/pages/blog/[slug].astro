@@ -4,13 +4,24 @@ import { getCollection, render } from 'astro:content';
 
 export async function getStaticPaths() {
   const posts = await getCollection('blog', ({ data }) => !data.draft && data.lang === 'ko');
-  return posts.map(post => ({
-    params: { slug: post.id },
-    props: { post },
-  }));
+  const allPosts = await getCollection('blog');
+
+  return posts.map(post => {
+    // Try to find matching EN post (replace -ko with -en)
+    const enId = post.id.replace(/-ko$/, '-en');
+    const enPost = allPosts.find(p => p.id === enId && p.data.lang === 'en');
+
+    return {
+      params: { slug: post.id },
+      props: { 
+        post,
+        alternateEn: enPost ? `/en/blog/${enPost.id}/` : '/en/blog/' 
+      },
+    };
+  });
 }
 
-const { post } = Astro.props;
+const { post, alternateEn } = Astro.props;
 const { Content } = await render(post);
 ---
 
@@ -21,6 +32,7 @@ const { Content } = await render(post);
   tags={post.data.tags}
   lang="ko"
   slug={post.id}
+  alternateEn={alternateEn}
 >
   <Content />
 </BlogPost>

@@ -6,6 +6,8 @@ interface Props {
   canonical?: string;
   ogImage?: string;
   bodyClass?: string;
+  alternateKo?: string;
+  alternateEn?: string;
 }
 
 const {
@@ -15,15 +17,17 @@ const {
   canonical,
   ogImage = '/assets/Logo 31NS-Tech.jpg',
   bodyClass = '',
+  alternateKo,
+  alternateEn,
 } = Astro.props;
 
 const canonicalURL = canonical ?? new URL(Astro.url.pathname, Astro.site).href;
 
-// Language switcher: current path ↔ alternate path
+// Language switcher: use explicit alternate if provided, otherwise fallback to path replacement
 const currentPath = Astro.url.pathname;
 const isEn = currentPath.startsWith('/en');
-const koPath = isEn ? currentPath.replace(/^\/en/, '') || '/' : currentPath;
-const enPath = isEn ? currentPath : '/en' + (currentPath === '/' ? '' : currentPath);
+const koPath = alternateKo ?? (isEn ? currentPath.replace(/^\/en/, '') || '/' : currentPath);
+const enPath = alternateEn ?? (isEn ? currentPath : '/en' + (currentPath === '/' ? '' : currentPath));
 
 // Active nav detection
 const p = currentPath;

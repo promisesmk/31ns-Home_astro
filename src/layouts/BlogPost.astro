@@ -8,9 +8,11 @@ interface Props {
   tags: string[];
   lang: 'ko' | 'en';
   slug: string;
+  alternateKo?: string;
+  alternateEn?: string;
 }
 
-const { title, description, date, tags, lang, slug } = Astro.props;
+const { title, description, date, tags, lang, slug, alternateKo, alternateEn } = Astro.props;
 
 const formattedDate = date.toLocaleDateString(lang === 'ko' ? 'ko-KR' : 'en-US', {
   year: 'numeric', month: 'long', day: 'numeric',
@@ -22,7 +24,13 @@ const backLabel = lang === 'en' ? '← Back to Blog' : '← 블로그 목록';
 const pageTitle = `${title} | 31NS-Tech Blog`;
 ---
 
-<BaseLayout title={pageTitle} description={description} lang={lang}>
+<BaseLayout 
+  title={pageTitle} 
+  description={description} 
+  lang={lang}
+  alternateKo={alternateKo}
+  alternateEn={alternateEn}
+>
   <section class="hero" style="padding: 100px 0 48px;">
     <div class="container">
       <div class="hero-label">// TECH_BLOG — {lang.toUpperCase()}</div>
