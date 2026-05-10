@@ -1,4 +1,6 @@
 // @ts-check
+// Deployment trigger: 2026-05-10
+
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 
