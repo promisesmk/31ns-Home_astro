@@ -1,0 +1,191 @@
+---
+interface Props {
+  title: string;
+  description: string;
+  lang?: 'ko' | 'en';
+  canonical?: string;
+  ogImage?: string;
+  bodyClass?: string;
+}
+
+const {
+  title,
+  description,
+  lang = 'ko',
+  canonical,
+  ogImage = '/assets/Logo 31NS-Tech.jpg',
+  bodyClass = '',
+} = Astro.props;
+
+const canonicalURL = canonical ?? new URL(Astro.url.pathname, Astro.site).href;
+
+// Language switcher: current path ↔ alternate path
+const currentPath = Astro.url.pathname;
+const isEn = currentPath.startsWith('/en');
+const koPath = isEn ? currentPath.replace(/^\/en/, '') || '/' : currentPath;
+const enPath = isEn ? currentPath : '/en' + (currentPath === '/' ? '' : currentPath);
+
+// Active nav detection
+const p = currentPath;
+const isHome    = p === '/' || p === '/en' || p === '/en/';
+const isAbout   = p.includes('/about');
+const isServices = p.includes('/services');
+const isPortfolio = p.includes('/portfolio');
+const isContact  = p.includes('/contact');
+const isBlog     = p.includes('/blog');
+
+const base = isEn ? '/en' : '';
+const nav = isEn
+  ? [
+      { href: '/en',           label: 'Home',      active: isHome },
+      { href: '/en/about',     label: 'About',     active: isAbout },
+      { href: '/en/services',  label: 'Services',  active: isServices },
+      { href: '/en/portfolio', label: 'Portfolio', active: isPortfolio },
+      { href: '/en/blog',      label: 'Blog',      active: isBlog },
+      { href: '/en/contact',   label: 'Contact',   active: isContact },
+    ]
+  : [
+      { href: '/',           label: 'Home',      active: isHome },
+      { href: '/about',      label: 'About',     active: isAbout },
+      { href: '/services',   label: 'Services',  active: isServices },
+      { href: '/portfolio',  label: 'Portfolio', active: isPortfolio },
+      { href: '/blog',       label: 'Blog',      active: isBlog },
+      { href: '/contact',    label: 'Contact',   active: isContact },
+    ];
+---
+
+<!DOCTYPE html>
+<html lang={lang}>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="google-site-verification" content="qu5hGjVkZSDNpjMph6IgMP4_tZRvpLXZIqfIaNYNoDo" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{title}</title>
+  <meta name="description" content={description} />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content={canonicalURL} />
+  <meta property="og:title" content={title} />
+  <meta property="og:description" content={description} />
+  <meta property="og:image" content={ogImage} />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content={title} />
+  <meta name="twitter:description" content={description} />
+
+  <!-- Canonical & hreflang -->
+  <link rel="canonical" href={canonicalURL} />
+  <link rel="alternate" hreflang="ko" href={`https://31ns.kr${koPath}`} />
+  <link rel="alternate" hreflang="en" href={`https://31ns.kr${enPath}`} />
+  <link rel="alternate" hreflang="x-default" href={`https://31ns.kr${koPath}`} />
+
+  <!-- Fonts & Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="/styles/global.css" />
+</head>
+
+<body class={bodyClass}>
+  <div class="bg"></div>
+
+  <!-- HEADER -->
+  <header>
+    <div class="container">
+      <nav>
+        <div class="logo">
+          <a href={isEn ? '/en' : '/'}>
+            <img src="/assets/Logo 31NS-Tech.jpg" alt="31NS-Tech Logo" />
+            <span class="logo-text">31NS-TECH</span>
+          </a>
+        </div>
+
+        <div class="system-status">
+          <span class="status-dot"></span>
+          <span>SYS_ONLINE</span>
+        </div>
+
+        <div style="display:flex; align-items:center; gap:12px;">
+          <!-- Language switcher -->
+          <div class="lang-switcher">
+            <a href={koPath} class={!isEn ? 'active' : ''}>KO</a>
+            <a href={enPath} class={isEn ? 'active' : ''}>EN</a>
+          </div>
+
+          <div class="menu-toggle" id="mobile-menu">
+            <i class="fas fa-bars"></i>
+          </div>
+        </div>
+
+        <ul class="nav-links">
+          {nav.map(item => (
+            <li><a href={item.href} class={item.active ? 'active' : ''}>{item.label}</a></li>
+          ))}
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <slot />
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <h4>31NS-Tech Hardware Lab</h4>
+          {isEn
+            ? <p>RF/hardware specialist with 20+ years of experience delivering <strong style="color: var(--gold-primary);">practical total engineering solutions</strong> from circuit design to mass production and certification.</p>
+            : <p>20년 이상 경력의 RF/하드웨어 전문가가 회로 설계부터 양산 및 인증까지 <strong style="color: var(--gold-primary);">실용적인 토털 엔지니어링 솔루션</strong>을 제공합니다.</p>
+          }
+        </div>
+        <div class="footer-col">
+          <h4>Quick Links</h4>
+          <ul>
+            {nav.filter(n => n.label !== 'Home').map(item => (
+              <li><a href={item.href}>{item.label}</a></li>
+            ))}
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Specialization</h4>
+          <ul>
+            <li>RF &amp; Wireless Optimization</li>
+            <li>Mixed-Signal Analog Front-End</li>
+            <li>BLE/NFC Circuit Design &amp; Tuning</li>
+            <li>KC/FCC/CE Certification Support</li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Contact</h4>
+          <ul>
+            <li><i class="fas fa-map-marker-alt"></i> Gwangmyeong-si, Gyeonggi-do</li>
+            <li><i class="fas fa-envelope"></i> nskim@31ns.kr</li>
+            <li><i class="fas fa-envelope"></i> promisesmk@gmail.com</li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        &copy; 2026 31NS-Tech Hardware Lab. All Rights Reserved. // SYS_VER 3.0
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const menuToggle = document.getElementById('mobile-menu');
+    const navLinks = document.querySelector('.nav-links');
+    menuToggle?.addEventListener('click', () => navLinks?.classList.toggle('active'));
+
+    const observer = new IntersectionObserver(
+      entries => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('animate-in'); }),
+      { threshold: 0.1 }
+    );
+    document.querySelectorAll('.card, .data-module, .content-block, .blog-card').forEach(el => {
+      (el as HTMLElement).style.opacity = '0';
+      observer.observe(el);
+    });
+  </script>
+</body>
+</html>

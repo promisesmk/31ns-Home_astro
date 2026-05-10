@@ -1,0 +1,137 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="About | 31NS-Tech Hardware Lab"
+  description="31NS-Tech Hardware Lab은 RF, BLE, NFC, Sensor, Mixed-Signal 기반 하드웨어 개발을 전문으로 하는 엔지니어링 연구소입니다."
+  lang="ko"
+  bodyClass="page-about"
+>
+  <section class="hero" style="padding: 100px 0 60px;">
+    <div class="container">
+      <div class="hero-label">// ABOUT — LAB PROFILE</div>
+      <h1>About <span class="gold">31NS-Tech</span></h1>
+      <p>RF · BLE · NFC · Sensor · Mixed-Signal 하드웨어 전문 연구소</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-tag">LAB OVERVIEW</div>
+        <h2>연구소 소개</h2>
+      </div>
+      <div class="data-module">
+        <div class="data-module-header">
+          <h3>// LAB_INFO.SYS</h3>
+          <div class="status"><span class="status-dot"></span> ACTIVE</div>
+        </div>
+        <div class="data-module-body">
+          <p style="margin-bottom: 16px;">
+            31NS-Tech Hardware Lab은 <span class="highlight">RF · BLE · NFC · Sensor · Mixed-Signal 기반 회로 및 제품 개발</span>을
+            전문으로 하는 엔지니어링 랩입니다.
+          </p>
+          <p>
+            지난 20년간 다양한 산업 환경 속에서 축적한 실제 경험을 바탕으로,
+            회로 설계, 펌웨어 협업, RF 튜닝, 양산 대응, 인증 대응까지
+            제품 개발의 모든 단계를 직접 수행하고 있습니다.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--alt">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-tag">ENGINEER PROFILE</div>
+        <h2>엔지니어 프로필</h2>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <h3><i class="fas fa-user-shield" style="color: var(--gold-primary); margin-right: 8px;"></i>핵심 경력</h3>
+          <ul>
+            <li>RF-BLE-NFC 기반 하드웨어 전문가</li>
+            <li>S전자, L전자 외 대기업 프로젝트 RF 설계 경험</li>
+            <li>Mixed-Signal Analog Front-End 개발</li>
+            <li>반도체·디스플레이 생산라인용 모니터링 센서보드 개발</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3><i class="fas fa-certificate" style="color: var(--gold-primary); margin-right: 8px;"></i>전문 역량</h3>
+          <ul>
+            <li>다양한 전자회로 및 PCB설계</li>
+            <li>양산제품 생산관리 및 공정문제 해결</li>
+            <li>기능·성능·신뢰성·환경시험</li>
+            <li>KC·FCC·CE 인증부적합 대응</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-tag">SPECIALIZATION</div>
+        <h2>주요 전문 분야</h2>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <i class="fas fa-satellite-dish card-icon"></i>
+          <h3>RF &amp; Wireless</h3>
+          <ul>
+            <li>2.4GHz ISM Band RF 회로 설계 및 최적화</li>
+            <li>Nordic 기반 BLE 모듈 HW 개발 및 튜닝</li>
+            <li>13.56MHz + 125kHz 복합 NFC 회로 설계</li>
+            <li>임피던스 매칭 · 안테나 매칭 · RF 튜닝</li>
+          </ul>
+        </div>
+        <div class="card">
+          <i class="fas fa-microchip card-icon"></i>
+          <h3>Sensor &amp; Mixed-Signal</h3>
+          <ul>
+            <li>Mixed-Signal 센서보드 개발</li>
+            <li>고전압/전류 제어 회로 설계</li>
+            <li>피에조 기반 96dB↑ 고출력 사운드 회로·구조 설계</li>
+            <li>초음파 트랜스듀서 기반 콘크리트 경도·강도 측정 장비 개발</li>
+          </ul>
+        </div>
+        <div class="card">
+          <i class="fas fa-lightbulb card-icon"></i>
+          <h3>Optics &amp; Miniature</h3>
+          <ul>
+            <li>동작감지 플래시·고출력 LED 플래시 회로</li>
+            <li>초소형 빌드업 PCB 기반 다중 센서 AFE 통합 모듈 설계</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--alt">
+    <div class="container">
+      <div class="section-header" style="text-align:center;">
+        <div class="section-tag" style="display:inline-block;">MISSION</div>
+        <h2>연구소 미션</h2>
+      </div>
+      <div class="data-module">
+        <div class="data-module-header">
+          <h3>// MISSION_STATEMENT.LOG</h3>
+          <div class="status"><span class="status-dot"></span> COMMITTED</div>
+        </div>
+        <div class="data-module-body" style="text-align:center;">
+          <p style="margin-bottom:16px;font-size:1.05rem;color:var(--text-primary);">
+            31NS-Tech Hardware Lab의 목표는 단순히 회로를 설계하는 것이 아니라,<br>
+            <span class="highlight">고객이 가진 문제를 기술로 명확하게 해결하는 것</span>입니다.
+          </p>
+          <p style="color:var(--text-secondary);">
+            복잡한 회로 구조도 이해하기 쉽고, 측정 가능한 성능 개선으로 연결되도록<br>
+            실전 중심의 접근 방식으로 프로젝트를 수행합니다.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

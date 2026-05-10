@@ -1,0 +1,57 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const posts = (await getCollection('blog', ({ data }) => !data.draft && data.lang === 'en'))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+---
+
+<BaseLayout
+  title="Technical Blog | 31NS-Tech Hardware Lab"
+  description="RF, BLE, NFC, Mixed-Signal hardware engineering technical articles. Antenna tuning, impedance matching, and mass production insights from 31NS-Tech."
+  lang="en"
+  bodyClass="page-blog"
+>
+  <section class="hero" style="padding: 100px 0 60px;">
+    <div class="container">
+      <div class="hero-label">// TECH_BLOG — EN</div>
+      <h1>Technical <span class="gold">Blog</span></h1>
+      <p>Practical RF &amp; hardware engineering insights and references</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      {posts.length === 0 ? (
+        <div class="data-module">
+          <div class="data-module-header">
+            <h3>// BLOG_QUEUE.LOG</h3>
+            <div class="status"><span class="status-dot"></span> PENDING</div>
+          </div>
+          <div class="data-module-body">
+            <p style="color: var(--text-secondary); font-family: var(--font-mono); font-size: 0.85rem;">
+              > Technical articles are being prepared. Check back soon.
+            </p>
+          </div>
+        </div>
+      ) : (
+        <div class="blog-grid">
+          {posts.map(post => (
+            <a href={`/en/blog/${post.id}`} class="blog-card">
+              <div class="blog-card-meta">
+                <span><i class="fas fa-calendar-alt" style="margin-right:4px;color:var(--gold-primary)"></i>
+                  {post.data.date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                </span>
+              </div>
+              <div class="blog-card-title">{post.data.title}</div>
+              <div class="blog-card-excerpt">{post.data.description}</div>
+              <div class="blog-card-tags">
+                {post.data.tags.map((tag: string) => <span class="tag">{tag}</span>)}
+              </div>
+            </a>
+          ))}
+        </div>
+      )}
+    </div>
+  </section>
+</BaseLayout>

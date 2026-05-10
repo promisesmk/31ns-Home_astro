@@ -1,0 +1,134 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Portfolio | 31NS-Tech Hardware Lab"
+  description="31NS-Tech Hardware Lab의 최근 하드웨어 개발 포트폴리오. BLE 온도 모니터링, 소방 경보기(PASS), Mixed-Signal 센서보드, NFC 듀얼 안테나, BLE 모듈 개발 사례."
+  lang="ko"
+  bodyClass="page-portfolio"
+>
+  <section class="hero" style="padding: 100px 0 60px;">
+    <div class="container">
+      <div class="hero-label">// PORTFOLIO — PROJECT ARCHIVE</div>
+      <h1>Project <span class="gold">Portfolio</span></h1>
+      <p>최근 수행한 주요 하드웨어 개발 사례</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-tag">PROJECT ARCHIVE</div>
+        <h2>주요 개발 사례</h2>
+      </div>
+
+      <div class="data-module" style="margin-bottom: 20px;">
+        <div class="data-module-header">
+          <h3>// PROJECT_000 — PREDICTIVE MAINT</h3>
+          <div class="status"><span class="status-dot"></span> MASS_PROD</div>
+        </div>
+        <div class="data-module-body">
+          <h3 style="font-family:var(--font-ui);font-size:1.1rem;color:var(--text-primary);margin-bottom:12px;">
+            Condition Monitoring &amp; Predictive Maintenance
+          </h3>
+          <p style="font-size:0.9rem;color:var(--text-secondary);margin-bottom:16px;">
+            다중 센서 통합 및 폼팩터 극소형화 설계, 국내 주요 대기업(S사, L사) 양산 공급 완료
+          </p>
+          <div class="grid-2" style="gap:12px;">
+            <div style="font-family:var(--font-mono);font-size:0.8rem;color:var(--text-secondary);padding-left:16px;position:relative;"><span style="position:absolute;left:0;color:var(--gold-primary);">›</span> 초집적 폼팩터 커스텀 설계</div>
+            <div style="font-family:var(--font-mono);font-size:0.8rem;color:var(--text-secondary);padding-left:16px;position:relative;"><span style="position:absolute;left:0;color:var(--gold-primary);">›</span> 산업용 다중 센서 최적화 통합</div>
+            <div style="font-family:var(--font-mono);font-size:0.8rem;color:var(--text-secondary);padding-left:16px;position:relative;"><span style="position:absolute;left:0;color:var(--gold-primary);">›</span> 하이브리드 통신 인터페이스 지원</div>
+            <div style="font-family:var(--font-mono);font-size:0.8rem;color:var(--text-secondary);padding-left:16px;position:relative;"><span style="position:absolute;left:0;color:var(--gold-primary);">›</span> B2B 양산 및 품질 검증</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="data-module" style="margin-bottom: 20px;">
+        <div class="data-module-header">
+          <h3>// PROJECT_001 — BLE TEMP MONITOR</h3>
+          <div class="status"><span class="status-dot"></span> DEPLOYED</div>
+        </div>
+        <div class="data-module-body">
+          <h3 style="font-family:var(--font-ui);font-size:1.1rem;color:var(--text-primary);margin-bottom:12px;">
+            코로나19 대응 온도 모니터링 장치
+          </h3>
+          <p style="font-size:0.9rem;color:var(--text-secondary);margin-bottom:16px;">
+            국가 재난대응에 사용된 BLE 기반 저전력 온도 모니터링 장치입니다.
+            극저온 환경(-20°C ~ -70°C)에서도 안정적으로 동작하도록 설계했습니다.
+          </p>
+          <div class="grid-2" style="gap:12px;">
+            <div style="font-family:var(--font-mono);font-size:0.8rem;color:var(--text-secondary);padding-left:16px;position:relative;"><span style="position:absolute;left:0;color:var(--gold-primary);">›</span> BLE 통신 모듈 (Nordic nRF52 Series)</div>
+            <div style="font-family:var(--font-mono);font-size:0.8rem;color:var(--text-secondary);padding-left:16px;position:relative;"><span style="position:absolute;left:0;color:var(--gold-primary);">›</span> 외부 온도 센싱 프로브 인터페이스</div>
+            <div style="font-family:var(--font-mono);font-size:0.8rem;color:var(--text-secondary);padding-left:16px;position:relative;"><span style="position:absolute;left:0;color:var(--gold-primary);">›</span> 저전력 펌웨어 최적화 구조</div>
+            <div style="font-family:var(--font-mono);font-size:0.8rem;color:var(--text-secondary);padding-left:16px;position:relative;"><span style="position:absolute;left:0;color:var(--gold-primary);">›</span> KC 인증 대응 및 양산 공급</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="data-module" style="margin-bottom: 20px;">
+        <div class="data-module-header">
+          <h3>// PROJECT_002 — PASS ALARM</h3>
+          <div class="status"><span class="status-dot"></span> DEPLOYED</div>
+        </div>
+        <div class="data-module-body">
+          <h3 style="font-family:var(--font-ui);font-size:1.1rem;color:var(--text-primary);margin-bottom:12px;">
+            소방 장비용 인명구조 경보기(PASS)
+          </h3>
+          <p style="font-size:0.9rem;color:var(--text-secondary);margin-bottom:16px;">
+            소방관을 위한 고출력 경보음(96dB) + 방수 구조의 인명구조 장비 개발 프로젝트입니다.
+            충격/진동/고열 등 극한 환경 설계가 핵심이었습니다.
+          </p>
+          <div class="grid-2" style="gap:12px;">
+            <div style="font-family:var(--font-mono);font-size:0.8rem;color:var(--text-secondary);padding-left:16px;position:relative;"><span style="position:absolute;left:0;color:var(--gold-primary);">›</span> 피에조 + 울림통 기반 경보 구조 설계</div>
+            <div style="font-family:var(--font-mono);font-size:0.8rem;color:var(--text-secondary);padding-left:16px;position:relative;"><span style="position:absolute;left:0;color:var(--gold-primary);">›</span> OLED 상태 디스플레이 및 센서 연동</div>
+            <div style="font-family:var(--font-mono);font-size:0.8rem;color:var(--text-secondary);padding-left:16px;position:relative;"><span style="position:absolute;left:0;color:var(--gold-primary);">›</span> 극한 환경 내구성 (방수 IP67)</div>
+            <div style="font-family:var(--font-mono);font-size:0.8rem;color:var(--text-secondary);padding-left:16px;position:relative;"><span style="position:absolute;left:0;color:var(--gold-primary);">›</span> KC 인증 및 소방청 기준 충족</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="data-module" style="margin-bottom: 20px;">
+        <div class="data-module-header">
+          <h3>// PROJECT_003 — NFC DUAL ANTENNA</h3>
+          <div class="status"><span class="status-dot"></span> COMPLETED</div>
+        </div>
+        <div class="data-module-body">
+          <h3 style="font-family:var(--font-ui);font-size:1.1rem;color:var(--text-primary);margin-bottom:12px;">
+            NFC 듀얼 주파수 안테나 시스템
+          </h3>
+          <p style="font-size:0.9rem;color:var(--text-secondary);margin-bottom:16px;">
+            125kHz + 13.56MHz 두 주파수를 단일 리더기에서 동시 지원하는 복합 NFC 시스템입니다.
+          </p>
+          <div class="grid-2" style="gap:12px;">
+            <div style="font-family:var(--font-mono);font-size:0.8rem;color:var(--text-secondary);padding-left:16px;position:relative;"><span style="position:absolute;left:0;color:var(--gold-primary);">›</span> 듀얼 코일 레이아웃 최적화</div>
+            <div style="font-family:var(--font-mono);font-size:0.8rem;color:var(--text-secondary);padding-left:16px;position:relative;"><span style="position:absolute;left:0;color:var(--gold-primary);">›</span> 주파수 간 간섭 노치 필터 설계</div>
+            <div style="font-family:var(--font-mono);font-size:0.8rem;color:var(--text-secondary);padding-left:16px;position:relative;"><span style="position:absolute;left:0;color:var(--gold-primary);">›</span> 독립 매칭 네트워크 구성</div>
+            <div style="font-family:var(--font-mono);font-size:0.8rem;color:var(--text-secondary);padding-left:16px;position:relative;"><span style="position:absolute;left:0;color:var(--gold-primary);">›</span> 금속 환경 페라이트 차폐 대응</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="data-module">
+        <div class="data-module-header">
+          <h3>// PROJECT_004 — ULTRASONIC SENSOR</h3>
+          <div class="status"><span class="status-dot"></span> COMPLETED</div>
+        </div>
+        <div class="data-module-body">
+          <h3 style="font-family:var(--font-ui);font-size:1.1rem;color:var(--text-primary);margin-bottom:12px;">
+            초음파 기반 콘크리트 강도 측정 장비
+          </h3>
+          <p style="font-size:0.9rem;color:var(--text-secondary);margin-bottom:16px;">
+            초음파 트랜스듀서를 활용하여 콘크리트의 경도 및 압축강도를 비파괴 측정하는 장비입니다.
+          </p>
+          <div class="grid-2" style="gap:12px;">
+            <div style="font-family:var(--font-mono);font-size:0.8rem;color:var(--text-secondary);padding-left:16px;position:relative;"><span style="position:absolute;left:0;color:var(--gold-primary);">›</span> 초음파 트랜스듀서 드라이브 회로</div>
+            <div style="font-family:var(--font-mono);font-size:0.8rem;color:var(--text-secondary);padding-left:16px;position:relative;"><span style="position:absolute;left:0;color:var(--gold-primary);">›</span> 고속 ADC 기반 ToF 측정</div>
+            <div style="font-family:var(--font-mono);font-size:0.8rem;color:var(--text-secondary);padding-left:16px;position:relative;"><span style="position:absolute;left:0;color:var(--gold-primary);">›</span> 신호 필터링 및 노이즈 억제</div>
+            <div style="font-family:var(--font-mono);font-size:0.8rem;color:var(--text-secondary);padding-left:16px;position:relative;"><span style="position:absolute;left:0;color:var(--gold-primary);">›</span> 현장용 휴대형 폼팩터 설계</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

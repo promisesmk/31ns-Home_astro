@@ -1,0 +1,56 @@
+---
+import BaseLayout from './BaseLayout.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  date: Date;
+  tags: string[];
+  lang: 'ko' | 'en';
+  slug: string;
+}
+
+const { title, description, date, tags, lang, slug } = Astro.props;
+
+const formattedDate = date.toLocaleDateString(lang === 'ko' ? 'ko-KR' : 'en-US', {
+  year: 'numeric', month: 'long', day: 'numeric',
+});
+
+const backHref = lang === 'en' ? '/en/blog' : '/blog';
+const backLabel = lang === 'en' ? '← Back to Blog' : '← 블로그 목록';
+
+const pageTitle = `${title} | 31NS-Tech Blog`;
+---
+
+<BaseLayout title={pageTitle} description={description} lang={lang}>
+  <section class="hero" style="padding: 100px 0 48px;">
+    <div class="container">
+      <div class="hero-label">// TECH_BLOG — {lang.toUpperCase()}</div>
+      <a href={backHref} class="back-link">{backLabel}</a>
+      <div class="blog-post-header">
+        <h1 class="blog-post-title">{title}</h1>
+        <div class="blog-post-meta">
+          <span><i class="fas fa-calendar-alt" style="margin-right:6px;color:var(--gold-primary)"></i>{formattedDate}</span>
+          {tags.length > 0 && (
+            <span><i class="fas fa-tags" style="margin-right:6px;color:var(--gold-primary)"></i>{tags.join(' · ')}</span>
+          )}
+        </div>
+        <div class="blog-card-tags">
+          {tags.map(tag => <span class="tag">{tag}</span>)}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="blog-post-body">
+        <slot />
+      </div>
+
+      <div style="margin-top: 48px; padding-top: 32px; border-top: 1px solid var(--border-color);">
+        <a href={backHref} class="back-link">{backLabel}</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

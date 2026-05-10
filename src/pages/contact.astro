@@ -1,0 +1,85 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Contact | 31NS-Tech Hardware Lab"
+  description="31NS-Tech Hardware Lab의 프로젝트 의뢰, RF·BLE·NFC·센서·Mixed-Signal 회로 설계 및 기술 상담 문의 페이지입니다."
+  lang="ko"
+  bodyClass="page-contact"
+>
+  <section class="hero" style="padding: 100px 0 60px;">
+    <div class="container">
+      <div class="hero-label">// CONTACT — OPEN CHANNEL</div>
+      <h1><span class="gold">Contact</span></h1>
+      <p>프로젝트 의뢰 · 기술 상담 · 협업 문의</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="grid-3" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
+        <div class="card">
+          <i class="fas fa-envelope-open-text card-icon"></i>
+          <h3>문의 안내</h3>
+          <p>
+            31NS-Tech Hardware Lab은 RF · BLE · NFC · 센서 · Mixed-Signal 하드웨어 기반의 실전형 엔지니어링 프로젝트를 수행합니다.
+          </p>
+          <p style="margin-top:12px;font-size:0.85rem;">
+            회로설계, RF 튜닝, 제품 개발, 인증 대응, 양산 기술지원 등 상담이 필요하신 경우 아래 연락처로 문의해주세요.
+          </p>
+        </div>
+        <div class="card">
+          <i class="fas fa-address-card card-icon"></i>
+          <h3>연락처 정보</h3>
+          <ul>
+            <li><i class="fas fa-envelope" style="color:var(--gold-primary);margin-right:8px;"></i> promisesmk@gmail.com</li>
+            <li><i class="fas fa-envelope" style="color:var(--gold-primary);margin-right:8px;"></i> nskim@31ns.kr</li>
+            <li><i class="fas fa-map-marker-alt" style="color:var(--gold-primary);margin-right:8px;"></i> Gwangmyeong-si, Gyeonggi-do</li>
+          </ul>
+        </div>
+        <div class="card">
+          <i class="fas fa-clipboard-list card-icon"></i>
+          <h3>문의 시 준비사항</h3>
+          <ul>
+            <li>필요 기능 또는 문제점 요약</li>
+            <li>대략적인 사용 환경 (온도·전원·거리·RF 조건 등)</li>
+            <li>예상 일정 / 목표 스펙</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--alt">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-tag">TECH KEYWORDS</div>
+        <h2>핵심 전문 기술 키워드</h2>
+        <p>프로젝트 의뢰 시 참고하시면 상담이 더욱 효율적으로 진행됩니다.</p>
+      </div>
+
+      <div class="data-module" style="margin-bottom:24px;">
+        <div class="data-module-header">
+          <h3>// KEYWORD_MATRIX.DB</h3>
+          <div class="status"><span class="status-dot"></span> INDEXED</div>
+        </div>
+        <div class="data-module-body" style="overflow-x:auto;padding:0;">
+          <table class="keyword-table">
+            <thead>
+              <tr><th>카테고리</th><th>키워드</th></tr>
+            </thead>
+            <tbody>
+              <tr><th>RF/무선 통신</th><td>RF 하드웨어 개발, BLE, NFC, 2.4GHz RF, Nordic (BLE 모듈), RF 회로 개발, RF출력튜닝, 안테나 튜닝, 임피던스 매칭, 2.4G 패턴 안테나 설계</td></tr>
+              <tr><th>회로 설계/PCB</th><td>PCB 설계, 빌드업 PCB 설계, 전자 회로 CAD, 디지털 회로, 아날로그 회로, Mixed-Signal AFE, 센서 회로 (산업용), 고전압/고전류 제어</td></tr>
+              <tr><th>부품/모듈</th><td>초음파 센서, 피에조 사운드, 미니 후레쉬 (LED 조명 회로)</td></tr>
+              <tr><th>인증/생산</th><td>KC/FCC/CE 인증, 양산 관리, DFM (제조를 위한 설계)</td></tr>
+              <tr><th>소프트웨어</th><td>펌웨어 개발, 임베디드 소프트웨어</td></tr>
+              <tr><th>서비스/문의</th><td>기술 상담, 하드웨어 개발 문의</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
