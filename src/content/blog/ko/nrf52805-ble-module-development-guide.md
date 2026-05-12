@@ -1,8 +1,8 @@
 ---
 title: "nRF52805 기반 초소형 BLE 모듈 개발: 설계부터 양산까지의 초격차 디테일"
 description: "nRF52805 칩셋 선정, 7차 CAD 검토 히스토리, HPL 공법 적용, Half Hole 제조 이슈 해결 및 양산 JIG 테스트 로직까지 담은 하드웨어 엔지니어링의 정수."
-pubDate: 2025-03-15
-category: "Hardware"
+date: 2025-03-15
+lang: "ko"
 tags: ["nRF52805", "BLE", "Antenna Matching", "Hardware Design", "PCB Fabrication", "HPL", "Manufacturing"]
 ---
 

@@ -1,8 +1,8 @@
 ---
 title: "The Ultimate Engineering Guide: Developing Ultra-Small nRF52805 BLE Modules from Design to Mass Production"
 description: "A deep dive into nRF52805 chipset selection, 7 rounds of CAD review history, HPL technology implementation, half hole manufacturing troubleshooting, and mass production JIG test logic."
-pubDate: 2025-03-15
-category: "Hardware"
+date: 2025-03-15
+lang: "en"
 tags: ["nRF52805", "BLE", "Antenna Matching", "Hardware Design", "PCB Fabrication", "HPL", "Mass Production"]
 ---
 
