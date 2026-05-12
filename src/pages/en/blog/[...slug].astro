@@ -7,15 +7,20 @@ export async function getStaticPaths() {
   const allPosts = await getCollection('blog');
 
   return posts.map(post => {
-    // Try to find matching KO post (replace -en with -ko)
-    const koId = post.id.replace(/-en$/, '-ko');
-    const koPost = allPosts.find(p => p.id === koId && p.data.lang === 'ko');
+    // Strip 'en/' prefix to get a clean slug (e.g. 'en/my-post' → 'my-post')
+    const slug = post.id.replace(/^en\//, '');
+
+    // Find matching KO post by comparing clean slugs
+    const koPost = allPosts.find(p =>
+      p.data.lang === 'ko' &&
+      p.id.replace(/^ko\//, '') === slug
+    );
 
     return {
-      params: { slug: post.id },
-      props: { 
+      params: { slug },
+      props: {
         post,
-        alternateKo: koPost ? `/blog/${koPost.id}/` : '/blog/' 
+        alternateKo: koPost ? `/blog/${koPost.id.replace(/^ko\//, '')}/` : '/blog/',
       },
     };
   });
@@ -31,7 +36,7 @@ const { Content } = await render(post);
   date={post.data.date}
   tags={post.data.tags}
   lang="en"
-  slug={post.id}
+  slug={post.id.replace(/^en\//, '')}
   alternateKo={alternateKo}
 >
   <Content />
