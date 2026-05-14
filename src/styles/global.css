@@ -244,9 +244,13 @@ nav {
     width: 100%;
 }
 
-/* ── Vertical Video Container ── */
+/* ── Horizontal Video Container — two videos side by side ── */
 .hero-video {
+    display: flex;
+    flex-direction: row;
+    gap: 16px;
     width: 100%;
+    align-items: flex-start;
 }
 
 .video-terminal {
@@ -783,7 +787,8 @@ footer {
         gap: 32px;
     }
     .hero-video {
-        flex: 0 0 220px;
+        flex-direction: row;
+        gap: 12px;
     }
 }
 
