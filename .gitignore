@@ -28,3 +28,6 @@ pnpm-debug.log*
 
 # VS Code settings (optional - remove if you want to share settings)
 .vscode/
+word_to_blog/31ns-Home-blog-assets/  
+word_to_blog/input/  
+word_to_blog/output/ 

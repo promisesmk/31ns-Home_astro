@@ -1,0 +1,4 @@
+mammoth==1.8.0
+markdownify==0.13.1
+Pillow==10.4.0
+deep-translator==1.11.4
