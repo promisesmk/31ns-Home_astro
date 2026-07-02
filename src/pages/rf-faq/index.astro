@@ -1,0 +1,270 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const faqs = await getCollection('faq');
+const sortedFaqs = faqs.sort((a, b) => a.id.localeCompare(b.id));
+
+// Generate dynamic FAQpage schema for the main hub page too
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": sortedFaqs.slice(0, 10).map(faq => ({ // Limit to first 10 for the main index schema to avoid excessive size
+    "@type": "Question",
+    "name": faq.data.title,
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": faq.body.trim()
+    }
+  }))
+};
+---
+
+<BaseLayout
+  title="RF & 무선 하드웨어 개발 실무 FAQ | 31NS-Tech Hardware Lab"
+  description="RF 회로 설계, 50옴 안테나 매칭, BLE 블루투스 통신 최적화, 환경 신뢰성 테스트, KC/FCC 인증 및 양산 수율 관리 등 하드웨어 엔지니어링 실무 질의응답 지식 베이스"
+>
+  <!-- Inject Main FAQ Schema for Google -->
+  <script type="application/ld+json" is:raw set:html={JSON.stringify(faqSchema)} />
+
+  <style>
+    .category-btn {
+      background: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-secondary);
+      padding: 8px 18px;
+      border-radius: 4px;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .category-btn:hover {
+      border-color: var(--gold-primary);
+      color: var(--gold-primary);
+      background: rgba(212, 175, 55, 0.02);
+    }
+    .category-btn.active {
+      background: var(--gold-primary);
+      border-color: var(--gold-primary);
+      color: #000;
+      font-weight: bold;
+      box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+    }
+    .faq-item.active {
+      border-color: var(--gold-primary) !important;
+      background: rgba(255, 255, 255, 0.02) !important;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+    .faq-item.active .faq-question-btn i {
+      transform: rotate(180deg);
+    }
+    .faq-link:hover {
+      border-bottom-color: var(--gold-primary) !important;
+    }
+    #faq-search::placeholder {
+      color: var(--text-muted);
+      opacity: 0.6;
+    }
+    /* Simple scale animation on tab switch */
+    .faq-item {
+      animation: fadeIn 0.3s ease forwards;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+
+  <!-- HERO HEADER -->
+  <section class="hero" style="padding: 110px 0 48px;">
+    <div class="container">
+      <div class="section-header" style="text-align: center; margin-bottom: 24px;">
+        <div class="section-tag" style="display: inline-block;">RF DATABASE</div>
+        <h1 style="font-size: 2.2rem; line-height: 1.3; margin-top: 12px;">
+          하드웨어 실무 지식 베이스
+        </h1>
+        <p style="margin: 16px auto 0; max-width: 650px; color: var(--text-secondary); font-size: 1.05rem;">
+          RF 회로 설계, 안테나 튜닝, BLE 블루투스 통신, 신뢰성 규격 및 전파 인증(KC/FCC)까지 개발부터 양산 수율 관리 중 직면하는 실무 과제와 해결 방안을 모았습니다.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- MAIN FAQ SECTION -->
+  <section class="section" style="padding: 10px 0 80px;">
+    <div class="container">
+      
+      <!-- Live Search Bar -->
+      <div class="terminal-search-container" style="margin-bottom: 24px;">
+        <div class="terminal-input-wrapper" style="display: flex; align-items: center; background: rgba(0,0,0,0.35); border: 1px solid var(--border-color); border-radius: 4px; padding: 12px 16px; box-shadow: inset 0 2px 8px rgba(0,0,0,0.5);">
+          <span style="font-family: var(--font-mono); color: var(--gold-primary); margin-right: 12px; font-weight: bold; white-space: nowrap;">
+            nskim@31ns-tech:~$ query --text
+          </span>
+          <input 
+            type="text" 
+            id="faq-search" 
+            placeholder="검색어를 입력하세요 (예: 안테나, BLE, 인증, 크리스탈)..." 
+            style="background: transparent; border: none; outline: none; color: var(--text-primary); font-family: var(--font-mono); width: 100%; font-size: 0.95rem;" 
+          />
+        </div>
+      </div>
+
+      <!-- Category Filter Tabs -->
+      <div class="category-tabs" style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 32px; justify-content: center;">
+        <button class="category-btn active" data-category="all">전체보기</button>
+        <button class="category-btn" data-category="rf-tuning">RF &amp; 안테나 튜닝</button>
+        <button class="category-btn" data-category="nordic-ble">Nordic &amp; BLE</button>
+        <button class="category-btn" data-category="reliability">환경 신뢰성</button>
+        <button class="category-btn" data-category="certification">규격 &amp; 무선 인증</button>
+        <button class="category-btn" data-category="production">양산 &amp; 수급 컨설팅</button>
+      </div>
+
+      <!-- Q&A Accordion List -->
+      <div class="faq-list" style="display: flex; flex-direction: column; gap: 12px; max-width: 900px; margin: 0 auto;">
+        {sortedFaqs.map(faq => (
+          <div 
+            class="faq-item" 
+            data-category={faq.data.category} 
+            data-keywords={(faq.data.title + ' ' + faq.body + ' ' + faq.data.seoTitle + ' ' + faq.data.tags.join(' ')).toLowerCase()} 
+            style="border: 1px solid var(--border-color); border-radius: 4px; background: rgba(255,255,255,0.015); transition: all 0.25s ease;"
+          >
+            <button 
+              class="faq-question-btn" 
+              style="width: 100%; text-align: left; background: transparent; border: none; outline: none; padding: 18px 24px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; color: var(--text-primary); font-family: inherit; font-size: 1.05rem; font-weight: 500;"
+            >
+              <span style="padding-right: 16px; display: flex; align-items: flex-start; gap: 12px;">
+                <span style="color: var(--gold-primary); font-family: var(--font-mono); font-weight: bold; font-size: 0.95rem; margin-top: 2px;">Q.</span>
+                <span class="q-text" style="transition: color 0.2s;">{faq.data.title}</span>
+              </span>
+              <i class="fas fa-chevron-down" style="color: var(--gold-primary); font-size: 0.85rem; transition: transform 0.25s ease; margin-left: 8px;"></i>
+            </button>
+            
+            <div class="faq-answer-panel" style="max-height: 0; overflow: hidden; transition: max-height 0.25s ease-out; background: rgba(0,0,0,0.15); border-top: 1px solid transparent;">
+              <div style="padding: 24px; border-top: 1px solid rgba(255,255,255,0.03);">
+                <p style="line-height: 1.7; color: var(--text-secondary); margin-bottom: 24px; font-size: 1rem;">
+                  {faq.body}
+                </p>
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; border-top: 1px dashed rgba(255,255,255,0.05); padding-top: 16px;">
+                  <!-- Tags -->
+                  <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                    {faq.data.tags.map(tag => (
+                      <span style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-muted); background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); padding: 2px 8px; border-radius: 2px;">
+                        #{tag}
+                      </span>
+                    ))}
+                  </div>
+                  <!-- Deep Dive Link (for SEO indexing and details) -->
+                  <a 
+                    href={`/rf-faq/${faq.data.slug}/`} 
+                    style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--gold-primary); text-decoration: none; display: flex; align-items: center; gap: 6px; border-bottom: 1px solid transparent; transition: all 0.2s;" 
+                    class="faq-link"
+                  >
+                    // DETAIL_PAGE <i class="fas fa-arrow-right" style="font-size: 0.75rem;"></i>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+        
+        <!-- No results fallback -->
+        <div 
+          id="no-results" 
+          style="display: none; text-align: center; padding: 60px 48px; border: 1px dashed var(--border-color); border-radius: 4px; font-family: var(--font-mono); color: var(--text-secondary); background: rgba(0,0,0,0.1);"
+        >
+          <i class="fas fa-search-minus" style="font-size: 2.2rem; color: var(--gold-primary); margin-bottom: 16px; display: block;"></i>
+          // NO_MATCHING_RECORDS_FOUND
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Accordion and Search Filtering Scripts -->
+  <script>
+    // Accordion Logic
+    const faqItems = document.querySelectorAll('.faq-item');
+    
+    faqItems.forEach(item => {
+      const btn = item.querySelector('.faq-question-btn');
+      const panel = item.querySelector('.faq-answer-panel');
+      
+      btn?.addEventListener('click', () => {
+        const isActive = item.classList.contains('active');
+        
+        // Collapse all other panels to keep it extremely clean
+        faqItems.forEach(otherItem => {
+          if (otherItem !== item && otherItem.classList.contains('active')) {
+            otherItem.classList.remove('active');
+            const otherPanel = otherItem.querySelector('.faq-answer-panel') as HTMLElement;
+            if (otherPanel) otherPanel.style.maxHeight = '0';
+          }
+        });
+
+        // Toggle current panel
+        if (isActive) {
+          item.classList.remove('active');
+          if (panel) (panel as HTMLElement).style.maxHeight = '0';
+        } else {
+          item.classList.add('active');
+          if (panel) {
+            (panel as HTMLElement).style.maxHeight = panel.scrollHeight + 'px';
+          }
+        }
+      });
+    });
+
+    // Search and Category Filter Logic
+    const searchInput = document.getElementById('faq-search') as HTMLInputElement;
+    const categoryButtons = document.querySelectorAll('.category-btn');
+    const noResults = document.getElementById('no-results');
+
+    let currentCategory = 'all';
+    let searchQuery = '';
+
+    function filterFAQs() {
+      let visibleCount = 0;
+      
+      faqItems.forEach(item => {
+        const itemCategory = (item as HTMLElement).dataset.category;
+        const itemKeywords = (item as HTMLElement).dataset.keywords || '';
+        
+        const matchesCategory = currentCategory === 'all' || itemCategory === currentCategory;
+        const matchesSearch = searchQuery === '' || itemKeywords.includes(searchQuery);
+
+        if (matchesCategory && matchesSearch) {
+          (item as HTMLElement).style.display = 'block';
+          visibleCount++;
+        } else {
+          (item as HTMLElement).style.display = 'none';
+          // Force close if hidden
+          item.classList.remove('active');
+          const panel = item.querySelector('.faq-answer-panel') as HTMLElement;
+          if (panel) panel.style.maxHeight = '0';
+        }
+      });
+
+      if (noResults) {
+        noResults.style.display = visibleCount === 0 ? 'block' : 'none';
+      }
+    }
+
+    // Input listener
+    searchInput?.addEventListener('input', (e) => {
+      searchQuery = (e.target as HTMLInputElement).value.toLowerCase().trim();
+      filterFAQs();
+    });
+
+    // Tab buttons listener
+    categoryButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        categoryButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        
+        currentCategory = (btn as HTMLElement).dataset.category || 'all';
+        filterFAQs();
+      });
+    });
+  </script>
+</BaseLayout>

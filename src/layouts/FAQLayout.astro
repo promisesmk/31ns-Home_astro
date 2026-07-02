@@ -1,0 +1,121 @@
+---
+import BaseLayout from './BaseLayout.astro';
+
+interface Props {
+  title: string;
+  seoTitle: string;
+  description: string;
+  category: string;
+  tags: string[];
+  lang?: 'ko' | 'en';
+  plainAnswer: string;
+  alternateEn?: string;
+  alternateKo?: string;
+}
+
+const { title, seoTitle, description, category, tags, lang = 'ko', plainAnswer, alternateEn, alternateKo } = Astro.props;
+
+const backHref = lang === 'en' ? '/en/rf-faq/' : '/rf-faq/';
+const backLabel = lang === 'en' ? '← Back to RF FAQ' : '← RF FAQ 목록';
+
+// Format category for display
+const categoryLabelsKo: Record<string, string> = {
+  'rf-tuning': 'RF 설계 & 안테나 튜닝',
+  'nordic-ble': 'Nordic SoC & BLE 최적화',
+  'reliability': '신뢰성 & 납품 기준',
+  'certification': '규격 & 무선 인증',
+  'production': '양산 & 수급 컨설팅',
+};
+
+const categoryLabelsEn: Record<string, string> = {
+  'rf-tuning': 'RF & Antenna Tuning',
+  'nordic-ble': 'Nordic & BLE Optimization',
+  'reliability': 'Reliability & Standards',
+  'certification': 'Regulations & Certification',
+  'production': 'Production & Consulting',
+};
+
+const categoryLabel = lang === 'en' 
+  ? (categoryLabelsEn[category] || category)
+  : (categoryLabelsKo[category] || category);
+
+// Generate Google FAQ Schema
+const cleanAnswer = plainAnswer.replace(/\n/g, ' ').replace(/"/g, '\\"').trim();
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [{
+    "@type": "Question",
+    "name": title,
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": cleanAnswer
+    }
+  }]
+};
+---
+
+<BaseLayout 
+  title={`${seoTitle} | 31NS-Tech`} 
+  description={description} 
+  lang={lang}
+  alternateEn={alternateEn}
+  alternateKo={alternateKo}
+>
+  <!-- Inject FAQ JSON-LD Schema for Google SEO -->
+  <script type="application/ld+json" is:raw set:html={JSON.stringify(faqSchema)} />
+
+  <section class="hero" style="padding: 100px 0 32px;">
+    <div class="container">
+      <div class="hero-label">// RF_KNOWLEDGE_BASE — {categoryLabel.toUpperCase()}</div>
+      <a href={backHref} class="back-link" style="display: inline-block; margin-bottom: 24px; color: var(--gold-primary); text-decoration: none; font-family: var(--font-mono); font-size: 0.9rem;">
+        {backLabel}
+      </a>
+      <h1 class="blog-post-title" style="font-size: 1.8rem; line-height: 1.4; color: var(--text-primary); margin-top: 8px;">
+        {title}
+      </h1>
+    </div>
+  </section>
+
+  <section class="section" style="padding: 24px 0 80px;">
+    <div class="container">
+      <div class="data-module" style="margin-bottom: 40px;">
+        <div class="data-module-header" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-bottom: 1px solid var(--border-color); background: rgba(255,255,255,0.02);">
+          <span style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--gold-primary);">
+            // RF_DB_QUERY: RESOLVED
+          </span>
+          <div class="status" style="font-family: var(--font-mono); font-size: 0.8rem; display: flex; align-items: center; gap: 6px; color: #4caf50;">
+            <span class="status-dot" style="width: 8px; height: 8px; background-color: #4caf50; border-radius: 50%; display: inline-block; box-shadow: 0 0 8px #4caf50;"></span>
+            SYS_OK
+          </div>
+        </div>
+        <div class="data-module-body" style="padding: 24px; font-size: 1.05rem; line-height: 1.7; color: var(--text-secondary);">
+          <slot />
+        </div>
+      </div>
+
+      <!-- CTA Box to convert leads -->
+      <div class="cta-box" style="margin-top: 40px; padding: 32px 24px; border: 1px solid var(--gold-primary); background: rgba(212, 175, 55, 0.03); border-radius: 4px; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.2);">
+        <h3 style="color: var(--gold-primary); margin-bottom: 8px; font-family: var(--font-mono); font-size: 1.25rem;">
+          // NEED_RF_ENGINEERING_SOLUTION?
+        </h3>
+        <p style="font-size: 0.95rem; margin-bottom: 24px; color: var(--text-secondary); max-width: 600px; margin-left: auto; margin-right: auto;">
+          {lang === 'en' 
+            ? "Are you facing custom hardware design or RF interference challenges? 31NS-Tech leverages over 20 years of real-world expertise to engineer specialized solutions."
+            : "해당 하드웨어 설계 또는 RF 무선 간섭 이슈를 겪고 계십니까? 20년 실전 엔지니어링 경력의 31NS-Tech가 차별화된 솔루션을 제공합니다."
+          }
+        </p>
+        <a href={lang === 'en' ? "/en/contact/" : "/contact/"} class="btn" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 24px; font-size: 0.95rem; font-weight: 600; text-transform: uppercase;">
+          <i class="fas fa-paper-plane"></i> 
+          {lang === 'en' ? "Request Technical Consultation" : "기술 문의 및 프로젝트 의뢰"}
+        </a>
+      </div>
+
+      <div style="margin-top: 48px; padding-top: 24px; border-top: 1px solid var(--border-color);">
+        <a href={backHref} class="back-link" style="color: var(--gold-primary); text-decoration: none; font-family: var(--font-mono); font-size: 0.9rem;">
+          {backLabel}
+        </a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

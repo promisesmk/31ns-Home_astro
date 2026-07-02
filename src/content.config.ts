@@ -13,4 +13,22 @@ const blog = defineCollection({
   }),
 });
 
-export const collections = { blog };
+const faq = defineCollection({
+  loader: glob({
+    pattern: '**/*.md',
+    base: './src/content/faq',
+    id: ({ entry }) => entry.replace(/\.md$/, ''),
+  }),
+  schema: z.object({
+    title: z.string(),
+    seoTitle: z.string(),
+    description: z.string(),
+    category: z.string(),
+    tags: z.array(z.string()).default([]),
+    date: z.coerce.date().optional(),
+    lang: z.enum(['ko', 'en']).default('ko'),
+    slug: z.string(),
+  }),
+});
+
+export const collections = { blog, faq };

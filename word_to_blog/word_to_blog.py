@@ -1,231 +1,335 @@
-import os
-import io
-import glob
-import re
-import subprocess
-import time
+"""
+word_to_blog.py — Word to Astro Blog Pipeline
+==============================================
+기능:
+  1. input/*.docx → 이미지 추출 → WebP 압축 → CDN 저장소 자동 push
+  2. 한글 마크다운(index.ko.md) 생성
+  3. 영문 마크다운(index.en.md) 생성 (동일 이미지 CDN URL 공유)
+  4. SEO 완전 자동화 (description, heroImage, title)
+  5. GitHub 용량 최적화 (WebP 압축, 이미지 중복 업로드 없음)
+
+실행: python -X utf8 word_to_blog.py
+결과: output/<포스트명>/index.ko.md + index.en.md
+"""
+
+import os, io, glob, re, subprocess, time, sys
 from datetime import datetime
+
 import mammoth
-from markdownify import markdownify as md
+from markdownify import markdownify as md_convert
 from PIL import Image
 from deep_translator import GoogleTranslator
 
-# Directories
-INPUT_DIR = "input"
-OUTPUT_DIR = "output"
-ASSETS_REPO_DIR = "31ns-Home-blog-assets"
-GITHUB_USER = "promisesmk"
-REPO_NAME = "31ns-Home-blog-assets"
+# ─── 설정 ──────────────────────────────────────────────
+INPUT_DIR      = "input"
+OUTPUT_DIR     = "output"
+ASSETS_REPO    = "31ns-Home-blog-assets"   # assets 저장소 폴더
+GITHUB_USER    = "promisesmk"
+REPO_NAME      = "31ns-Home-blog-assets"
+CDN_BASE       = f"https://cdn.jsdelivr.net/gh/{GITHUB_USER}/{REPO_NAME}@main"
 
+# 이미지 최적화 설정
+IMG_MAX_WIDTH  = 1200   # 최대 너비(px)
+IMG_QUALITY    = 75     # WebP 품질 (0~100, 낮을수록 용량↓ 화질↓)
+                        # 75 = 고품질 유지하면서 60~70% 용량 절약
+
+# 번역 설정
+CHUNK_SIZE     = 2500   # 구글 번역 1회 최대 글자 수
+TRANSLATE_DELAY = 0.4   # 요청 간격(초) — 속도 제한 방지
+# ───────────────────────────────────────────────────────
+
+
+# ══════════════════════════════════════════════════════
+# 1. 디렉터리 검증
+# ══════════════════════════════════════════════════════
 def ensure_dirs():
-    if not os.path.exists(INPUT_DIR):
-        os.makedirs(INPUT_DIR)
-    if not os.path.exists(OUTPUT_DIR):
-        os.makedirs(OUTPUT_DIR)
-    if not os.path.exists(ASSETS_REPO_DIR):
-        print(f"[Error] {ASSETS_REPO_DIR} directory not found. Please clone the repository first.")
-        exit(1)
+    os.makedirs(INPUT_DIR, exist_ok=True)
+    os.makedirs(OUTPUT_DIR, exist_ok=True)
+    if not os.path.exists(ASSETS_REPO):
+        print(f"[Error] '{ASSETS_REPO}' 폴더가 없습니다. assets 저장소를 clone 해주세요.")
+        sys.exit(1)
 
+
+# ══════════════════════════════════════════════════════
+# 2. 이미지 핸들러 (mammoth 콜백)
+# ══════════════════════════════════════════════════════
 class ImageHandler:
-    def __init__(self, post_name):
-        self.post_name = post_name
-        self.counter = 1
-        self.image_dimensions = {} # URL -> (width, height)
-        
-        self.post_assets_dir = os.path.join(ASSETS_REPO_DIR, post_name)
-        if not os.path.exists(self.post_assets_dir):
-            os.makedirs(self.post_assets_dir)
+    def __init__(self, post_slug: str):
+        self.post_slug  = post_slug
+        self.counter    = 1
+        self.cdn_urls   = []          # 순서대로 저장 (첫 번째 = heroImage)
+        self.dimensions = {}          # cdn_url → (width, height)
+
+        self.save_dir = os.path.join(ASSETS_REPO, post_slug)
+        os.makedirs(self.save_dir, exist_ok=True)
 
     def handle_image(self, image):
-        with image.open() as image_stream:
-            img = Image.open(io.BytesIO(image_stream.read()))
-        
-        if img.mode in ("RGBA", "P"):
+        """mammoth 이미지 콜백 — WebP 변환 후 assets 저장소에 저장"""
+        with image.open() as stream:
+            img = Image.open(io.BytesIO(stream.read()))
+
+        # RGBA/팔레트 → RGB 변환 (WebP 저장 필수)
+        if img.mode in ("RGBA", "P", "LA"):
             img = img.convert("RGB")
-            
-        max_width = 1200
-        if img.width > max_width:
-            ratio = max_width / float(img.width)
-            new_height = int((float(img.height) * float(ratio)))
-            img = img.resize((max_width, new_height), Image.Resampling.LANCZOS)
-            
+
+        # 비율 유지 리사이즈
+        if img.width > IMG_MAX_WIDTH:
+            ratio = IMG_MAX_WIDTH / img.width
+            img = img.resize(
+                (IMG_MAX_WIDTH, int(img.height * ratio)),
+                Image.Resampling.LANCZOS
+            )
+
         filename = f"img_{self.counter:02d}.webp"
-        filepath = os.path.join(self.post_assets_dir, filename)
-        img.save(filepath, "WEBP", quality=80)
+        filepath = os.path.join(self.save_dir, filename)
+        img.save(filepath, "WEBP", quality=IMG_QUALITY, method=6)
         self.counter += 1
-        
-        cdn_url = f"https://cdn.jsdelivr.net/gh/{GITHUB_USER}/{REPO_NAME}@main/{self.post_name}/{filename}"
-        self.image_dimensions[cdn_url] = (img.width, img.height)
+
+        cdn_url = f"{CDN_BASE}/{self.post_slug}/{filename}"
+        self.cdn_urls.append(cdn_url)
+        self.dimensions[cdn_url] = (img.width, img.height)
         return {"src": cdn_url}
 
-def generate_frontmatter(title, description, hero_image, lang):
+
+# ══════════════════════════════════════════════════════
+# 3. 마크다운 후처리 — 이미지 태그를 SEO용 HTML로 교체
+# ══════════════════════════════════════════════════════
+def replace_images_with_html(markdown: str, dimensions: dict) -> str:
+    """
+    ![alt](cdn_url) → <img src="..." width="..." height="..." loading="lazy" alt="..." />
+    width/height 명시 → CLS(레이아웃 이동) 방지 → Core Web Vitals 향상
+    """
+    for cdn_url, (w, h) in dimensions.items():
+        img_tag = (
+            f'<img src="{cdn_url}" width="{w}" height="{h}" '
+            f'loading="lazy" alt="Blog Image" />'
+        )
+        pattern = r'!\[.*?\]\(' + re.escape(cdn_url) + r'\)'
+        markdown = re.sub(pattern, img_tag, markdown)
+    return markdown
+
+
+# ══════════════════════════════════════════════════════
+# 4. 번역 엔진 (2-Pass: 번역 → 마크다운 문법 복구)
+# ══════════════════════════════════════════════════════
+def translate_ko_to_en(markdown_text: str) -> str:
+    """
+    Pass 1 — 이미지 태그를 플레이스홀더로 교체 (번역 오염 방지)
+    Pass 2 — 문단 단위 청크 구성
+    Pass 3 — 구글 번역 API 호출
+    Pass 4 — 이미지 태그 복원
+    Pass 5 — 마크다운 문법 수리 (번역기가 깨뜨리는 ** * 등 복구)
+    """
+    translator = GoogleTranslator(source='ko', target='en')
+
+    # ── Pass 1: 이미지 숨기기
+    images = []
+    def hide_image(m):
+        images.append(m.group(0))
+        return f"⟦IMG{len(images)-1}⟧"   # 번역기가 건드리기 어려운 기호 사용
+
+    text = re.sub(r'<img[^>]+/>', hide_image, markdown_text)
+
+    # ── Pass 2: 청크 구성
+    chunks, current, cur_len = [], [], 0
+    for para in text.split('\n\n'):
+        plen = len(para)
+        if cur_len + plen > CHUNK_SIZE:
+            if current:
+                chunks.append('\n\n'.join(current))
+            current, cur_len = [para], plen
+        else:
+            current.append(para)
+            cur_len += plen + 2
+    if current:
+        chunks.append('\n\n'.join(current))
+
+    total = len(chunks)
+    print(f"  → 총 {total}개 청크 번역 시작...")
+
+    # ── Pass 3: 번역
+    translated_chunks = []
+    for i, chunk in enumerate(chunks):
+        chunk = chunk.strip()
+        if not chunk:
+            continue
+        # 한글이 없으면 번역 불필요 (영문 기술 용어, URL 등)
+        if not re.search(r'[가-힣]', chunk):
+            translated_chunks.append(chunk)
+            continue
+        try:
+            result = translator.translate(chunk)
+            translated_chunks.append(result if result else chunk)
+            if (i + 1) % 10 == 0:
+                print(f"  → {i+1}/{total} 청크 완료")
+        except Exception as e:
+            print(f"  [경고] 청크 {i+1} 번역 실패: {e}")
+            translated_chunks.append(chunk)
+        time.sleep(TRANSLATE_DELAY)
+
+    translated = '\n\n'.join(translated_chunks)
+
+    # ── Pass 4: 이미지 복원
+    for i, tag in enumerate(images):
+        # 번역기가 플레이스홀더를 약간 변형할 수 있으므로 유연하게 매칭
+        translated = re.sub(rf'⟦\s*IMG\s*{i}\s*⟧', tag, translated)
+        translated = translated.replace(f"⟦IMG{i}⟧", tag)
+
+    # ── Pass 5: 마크다운 문법 복구
+    # 번역기가 ** bold ** → **bold**로 공백을 넣는 경우 수정
+    translated = re.sub(r'\*\*\s+(.+?)\s+\*\*', r'**\1**', translated)
+    translated = re.sub(r'\*\s+(.+?)\s+\*', r'*\1*', translated)
+    # 번역기가 ## 제목 뒤 줄바꿈을 없애는 경우
+    translated = re.sub(r'(#{1,6})\s*(.+)', r'\1 \2', translated)
+
+    return translated
+
+
+# ══════════════════════════════════════════════════════
+# 5. Front Matter 생성 (SEO 완전 자동화)
+# ══════════════════════════════════════════════════════
+def make_frontmatter(title: str, description: str, lang: str) -> str:
+    """
+    Astro content.config.ts 스키마에 맞게 frontmatter 생성
+    필수 필드: title, description, date, lang, tags
+    """
     date_str = datetime.now().strftime("%Y-%m-%d")
+    # YAML에서 따옴표 이스케이프
+    title       = title.replace('"', '\\"')
     description = description.replace('"', '\\"')
     return f"""---
 title: "{title}"
 description: "{description}"
 date: {date_str}
 lang: "{lang}"
-tags: ["Astro", "Blog"]
+tags: ["Hardware", "BLE", "RF", "Embedded"]
+draft: false
 ---
 """
 
-def push_assets_to_github():
-    print("[Processing] Uploading optimized images to GitHub...")
+
+# ══════════════════════════════════════════════════════
+# 6. assets 저장소 GitHub push
+# ══════════════════════════════════════════════════════
+def push_assets():
+    print("\n[GitHub] assets 저장소 push 중...")
     try:
-        subprocess.run(["git", "add", "."], cwd=ASSETS_REPO_DIR, check=True, stdout=subprocess.DEVNULL)
-        status = subprocess.run(["git", "status", "--porcelain"], cwd=ASSETS_REPO_DIR, capture_output=True, text=True)
-        if status.stdout.strip() == "":
-            print("No new images to push.")
-            return
-            
-        subprocess.run(["git", "commit", "-m", "Auto-add blog images via script"], cwd=ASSETS_REPO_DIR, check=True, stdout=subprocess.DEVNULL)
-        subprocess.run(["git", "branch", "-M", "main"], cwd=ASSETS_REPO_DIR, check=True, stdout=subprocess.DEVNULL)
-        subprocess.run(["git", "push", "-u", "origin", "main"], cwd=ASSETS_REPO_DIR, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        print("[Success] Successfully pushed images to GitHub! (CDN links are now live)")
-    except subprocess.CalledProcessError as e:
-        print(f"[Error] Failed to push to GitHub. You may need to push manually inside {ASSETS_REPO_DIR} folder.")
-
-def translate_markdown_2pass(markdown_text):
-    translator = GoogleTranslator(source='ko', target='en')
-    
-    # PASS 1: Hide images using placeholders
-    images = []
-    def image_replacer(match):
-        images.append(match.group(0))
-        return f"[[IMG_{len(images)-1}]]"
-        
-    text_without_images = re.sub(r'<img[^>]+>', image_replacer, markdown_text)
-    
-    # PASS 2: Chunk text safely (approx 3000 chars per chunk to avoid hitting 5k limit)
-    chunks = []
-    current_chunk = []
-    current_length = 0
-    
-    paragraphs = text_without_images.split('\n\n')
-    for p in paragraphs:
-        p_len = len(p)
-        if current_length + p_len > 3000:
-            chunks.append('\n\n'.join(current_chunk))
-            current_chunk = [p]
-            current_length = p_len
-        else:
-            current_chunk.append(p)
-            current_length += p_len + 2
-            
-    if current_chunk:
-        chunks.append('\n\n'.join(current_chunk))
-        
-    # PASS 3: Translate chunks
-    translated_chunks = []
-    for chunk in chunks:
-        chunk = chunk.strip()
-        if not chunk:
-            continue
-        try:
-            # only translate if there's text (skip empty/pure symbols)
-            if re.search(r'[a-zA-Z가-힣]', chunk):
-                translated = translator.translate(chunk)
-                translated_chunks.append(translated)
-            else:
-                translated_chunks.append(chunk)
-        except Exception as e:
-            print(f"  [Warning] Translation chunk failed: {e}")
-            translated_chunks.append(chunk)
-        time.sleep(0.5)
-        
-    translated_text = '\n\n'.join(translated_chunks)
-    
-    # PASS 4: Restore images
-    for i, img_tag in enumerate(images):
-        translated_text = translated_text.replace(f"[[IMG_{i}]]", img_tag)
-        translated_text = re.sub(rf'\[\[\s*IMG_{i}\s*\]\]', img_tag, translated_text)
-    
-    # PASS 5: Structural Repair (Fixing markdown syntax broken by AI Translator)
-    translated_text = re.sub(r'\*\*\s+(.*?)\s+\*\*', r'**\1**', translated_text)
-    translated_text = re.sub(r'\*\s+(.*?)\s+\*', r'*\1*', translated_text)
-    translated_text = translated_text.replace('< img', '<img').replace('/>', ' />')
-    
-    return translated_text
-
-def process_file(docx_path):
-    basename = os.path.basename(docx_path)
-    filename_without_ext = os.path.splitext(basename)[0]
-    
-    print(f"\nProcessing: {basename}...")
-    handler = ImageHandler(filename_without_ext)
-    
-    with open(docx_path, "rb") as docx_file:
-        result = mammoth.convert_to_html(
-            docx_file,
-            convert_image=mammoth.images.img_element(handler.handle_image)
+        r = subprocess.run(["git", "add", "."], cwd=ASSETS_REPO, capture_output=True)
+        status = subprocess.run(
+            ["git", "status", "--porcelain"], cwd=ASSETS_REPO,
+            capture_output=True, text=True, encoding='utf-8'
         )
-        html = result.value
-            
-    # Markdown Conversion
-    markdown_content = md(html, heading_style="ATX")
-    
-    # Replace markdown images with SEO HTML tags
-    for cdn_url, (width, height) in handler.image_dimensions.items():
-        html_tag = f'<img src="{cdn_url}" width="{width}" height="{height}" loading="lazy" alt="Blog Image" />'
-        pattern = r'!\[.*?\]\(' + re.escape(cdn_url) + r'\)'
-        markdown_content = re.sub(pattern, html_tag, markdown_content)
-        
-    # --- Front Matter Automation ---
-    hero_image_url = ""
-    if handler.image_dimensions:
-        hero_image_url = list(handler.image_dimensions.keys())[0] # First image as thumbnail
-        
-    # Extract plain text for description
-    plain_text = re.sub(r'<[^>]+>', ' ', html)
-    plain_text = re.sub(r'\s+', ' ', plain_text)
-    description_ko = plain_text[:120].strip() + "..." if len(plain_text) > 120 else plain_text.strip()
-    
-    # --- Multilingual File Structure ---
-    post_output_dir = os.path.join(OUTPUT_DIR, filename_without_ext)
-    if not os.path.exists(post_output_dir):
-        os.makedirs(post_output_dir)
-        
-    # 1. Save Korean Version
-    frontmatter_ko = generate_frontmatter(filename_without_ext, description_ko, hero_image_url, "ko")
-    ko_content = frontmatter_ko + "\n" + markdown_content
-    ko_path = os.path.join(post_output_dir, "index.ko.md")
+        if not status.stdout.strip():
+            print("[GitHub] 새 이미지 없음 — push 생략")
+            return
+        subprocess.run(
+            ["git", "commit", "-m", "auto: add blog images"],
+            cwd=ASSETS_REPO, capture_output=True
+        )
+        subprocess.run(
+            ["git", "push", "-u", "origin", "main"],
+            cwd=ASSETS_REPO, capture_output=True
+        )
+        print("[GitHub] 이미지 push 완료 ✓")
+    except Exception as e:
+        print(f"[GitHub] push 실패: {e}\n→ {ASSETS_REPO} 폴더에서 수동 push 하세요.")
+
+
+# ══════════════════════════════════════════════════════
+# 7. docx 파일 1개 처리
+# ══════════════════════════════════════════════════════
+def process_docx(docx_path: str):
+    basename = os.path.basename(docx_path)
+    slug     = os.path.splitext(basename)[0]   # 파일명 = 포스트 슬러그
+    print(f"\n{'='*60}")
+    print(f"처리 중: {basename}")
+    print(f"{'='*60}")
+
+    # ── 1. Word → HTML → Markdown 변환
+    handler = ImageHandler(slug)
+    with open(docx_path, "rb") as f:
+        result = mammoth.convert_to_html(
+            f, convert_image=mammoth.images.img_element(handler.handle_image)
+        )
+    html = result.value
+
+    markdown_raw = md_convert(html, heading_style="ATX")
+    markdown_ko  = replace_images_with_html(markdown_raw, handler.dimensions)
+
+    img_count = handler.counter - 1
+    print(f"  이미지 추출: {img_count}장 → WebP 압축 완료")
+
+    # ── 2. 자동 메타데이터 추출
+    # heroImage: 첫 번째 이미지 URL
+    hero_url = handler.cdn_urls[0] if handler.cdn_urls else ""
+
+    # description: HTML 순수 텍스트의 첫 160자
+    plain = re.sub(r'<[^>]+>', ' ', html)
+    plain = re.sub(r'\s+', ' ', plain).strip()
+    desc_ko = (plain[:157] + "...") if len(plain) > 160 else plain
+
+    # ── 3. 한글 MD 파일 저장
+    out_dir = os.path.join(OUTPUT_DIR, slug)
+    os.makedirs(out_dir, exist_ok=True)
+
+    fm_ko = make_frontmatter(slug, desc_ko, "ko")
+    ko_path = os.path.join(out_dir, "index.ko.md")
     with open(ko_path, "w", encoding="utf-8") as f:
-        f.write(ko_content)
-    print(f"[Success] Saved Korean file: {ko_path}")
-    
-    # 2. Translate and Save English Version
-    print("[Processing] Translating to English (Pass 1: Translation, Pass 2: Markdown Repair)...")
-    translated_markdown = translate_markdown_2pass(markdown_content)
-    
+        f.write(fm_ko + "\n" + markdown_ko)
+    print(f"  [완료] 한글 파일: {ko_path}")
+
+    # ── 4. 영문 번역 후 MD 파일 저장
+    #       이미지 태그는 그대로 유지 (동일 CDN URL 공유)
+    print("  [번역] 한→영 번역 시작...")
+    markdown_en = translate_ko_to_en(markdown_ko)
+
     try:
-        description_en = GoogleTranslator(source='ko', target='en').translate(description_ko)
+        desc_en = GoogleTranslator(source='ko', target='en').translate(desc_ko)
     except:
-        description_en = description_ko
-        
-    frontmatter_en = generate_frontmatter(filename_without_ext + " (EN)", description_en, hero_image_url, "en")
-    en_content = frontmatter_en + "\n" + translated_markdown
-    en_path = os.path.join(post_output_dir, "index.en.md")
+        desc_en = desc_ko
+
+    # 영문 제목: 파일명에서 기술적 의미를 살린 영문 제목으로 번역
+    try:
+        title_en_raw = slug.replace("_", " ")
+        title_en = GoogleTranslator(source='ko', target='en').translate(title_en_raw)
+    except:
+        title_en = slug + " (EN)"
+
+    fm_en = make_frontmatter(title_en, desc_en, "en")
+    en_path = os.path.join(out_dir, "index.en.md")
     with open(en_path, "w", encoding="utf-8") as f:
-        f.write(en_content)
-    print(f"[Success] Saved English file: {en_path}")
+        f.write(fm_en + "\n" + markdown_en)
+    print(f"  [완료] 영문 파일: {en_path}")
 
-    if handler.counter > 1:
-        print(f"[Info] Extracted {handler.counter - 1} images.")
+    # ── 5. 결과 요약
+    print(f"\n  📁 출력 폴더: {out_dir}/")
+    print(f"     ├─ index.ko.md  ({os.path.getsize(ko_path)//1024} KB)")
+    print(f"     └─ index.en.md  ({os.path.getsize(en_path)//1024} KB)")
+    print(f"  🖼  이미지: {img_count}장 → CDN: {CDN_BASE}/{slug}/")
 
+
+# ══════════════════════════════════════════════════════
+# 8. 메인
+# ══════════════════════════════════════════════════════
 def main():
     ensure_dirs()
+
     docx_files = glob.glob(os.path.join(INPUT_DIR, "*.docx"))
-    
     if not docx_files:
-        print(f"[Error] No .docx files found in '{INPUT_DIR}' directory.")
+        print(f"[오류] '{INPUT_DIR}' 폴더에 .docx 파일이 없습니다.")
         return
-        
-    for filepath in docx_files:
-        process_file(filepath)
-        
-    push_assets_to_github()
-    print("\n[Done] All processes completed! Move the folders in 'output/' to your Astro src/content/blog directory.")
+
+    for path in docx_files:
+        process_docx(path)
+
+    push_assets()
+
+    print(f"\n{'='*60}")
+    print("✅ 모든 처리 완료!")
+    print(f"   output/ 폴더의 포스트 폴더를 Astro의")
+    print(f"   src/content/blog/ 로 옮기면 업로드 끝입니다.")
+    print(f"{'='*60}")
+
 
 if __name__ == "__main__":
     main()

@@ -26,8 +26,16 @@ const canonicalURL = canonical ?? new URL(Astro.url.pathname, Astro.site).href;
 // Language switcher: use explicit alternate if provided, otherwise fallback to path replacement
 const currentPath = Astro.url.pathname;
 const isEn = currentPath.startsWith('/en');
-const koPath = alternateKo ?? (isEn ? currentPath.replace(/^\/en/, '') || '/' : currentPath);
-const enPath = alternateEn ?? (isEn ? currentPath : '/en' + (currentPath === '/' ? '' : currentPath));
+
+const ensureTrailingSlash = (path: string) => {
+  return path.endsWith('/') ? path : path + '/';
+};
+
+const rawKoPath = alternateKo ?? (isEn ? currentPath.replace(/^\/en/, '') || '/' : currentPath);
+const rawEnPath = alternateEn ?? (isEn ? currentPath : '/en' + (currentPath === '/' ? '' : currentPath));
+
+const koPath = ensureTrailingSlash(rawKoPath);
+const enPath = ensureTrailingSlash(rawEnPath);
 
 // Active nav detection
 const p = currentPath;
@@ -41,12 +49,12 @@ const isBlog     = p.includes('/blog');
 const base = isEn ? '/en' : '';
 const nav = isEn
   ? [
-      { href: '/en',           label: 'Home',      active: isHome },
-      { href: '/en/about',     label: 'About',     active: isAbout },
-      { href: '/en/services',  label: 'Services',  active: isServices },
-      { href: '/en/portfolio', label: 'Portfolio', active: isPortfolio },
-      { href: '/en/blog',      label: 'Blog',      active: isBlog },
-      { href: '/en/contact',   label: 'Contact',   active: isContact },
+      { href: '/en/',          label: 'Home',      active: isHome },
+      { href: '/en/about/',    label: 'About',     active: isAbout },
+      { href: '/en/services/', label: 'Services',  active: isServices },
+      { href: '/en/portfolio/',label: 'Portfolio', active: isPortfolio },
+      { href: '/en/blog/',     label: 'Blog',      active: isBlog },
+      { href: '/en/contact/',  label: 'Contact',   active: isContact },
     ]
   : [
       { href: '/',            label: 'Home',      active: isHome },
@@ -153,6 +161,7 @@ const nav = isEn
             {nav.filter(n => n.label !== 'Home').map(item => (
               <li><a href={item.href}>{item.label}</a></li>
             ))}
+            <li><a href="/rf-faq/">RF FAQ</a></li>
           </ul>
         </div>
         <div class="footer-col">

@@ -1,0 +1,37 @@
+---
+import FAQLayout from '../../layouts/FAQLayout.astro';
+import { getCollection, render } from 'astro:content';
+
+export async function getStaticPaths() {
+  const faqs = await getCollection('faq');
+  const koFaqs = faqs.filter(faq => faq.data.lang === 'ko');
+
+  return koFaqs.map(faq => {
+    // Find matching EN faq by stripping the 'en/' prefix
+    const enFaq = faqs.find(f => f.data.lang === 'en' && f.data.slug.replace(/^en\//, '') === faq.data.slug);
+
+    return {
+      params: { slug: faq.data.slug },
+      props: { 
+        faq,
+        alternateEn: enFaq ? `/en/rf-faq/${enFaq.data.slug.replace(/^en\//, '')}/` : '/en/rf-faq/',
+      },
+    };
+  });
+}
+
+const { faq, alternateEn } = Astro.props;
+const { Content } = await render(faq);
+---
+
+<FAQLayout
+  title={faq.data.title}
+  seoTitle={faq.data.seoTitle}
+  description={faq.data.description}
+  category={faq.data.category}
+  tags={faq.data.tags}
+  plainAnswer={faq.body}
+  alternateEn={alternateEn}
+>
+  <Content />
+</FAQLayout>
