@@ -1,10 +1,11 @@
 ---
-title: "nRF52805_BLE모듈_개발기술참고문서_이미지포함"
+title: "nRF52805 BLE 모듈 회로 설계 및 하드웨어 개발 기술 참고문서"
 description: "nRF52805 BLE 모듈 개발 기술 참고 문서 (개발자용) GX805 / GX805C Series · Nordic Semiconductor nRF52805 WLCSP ⚠ 민감정보 익명 처리 안내: 원본의 회사명·인명·연락처 등은 [고객사], [담당이사A], [대표B], [담당이..."
 date: 2026-05-14
 lang: "ko"
 tags: ["Hardware", "BLE", "RF", "Embedded"]
 draft: false
+slug: "nrf52805-ble-module-development"
 ---
 
 **nRF52805 BLE 모듈 개발**

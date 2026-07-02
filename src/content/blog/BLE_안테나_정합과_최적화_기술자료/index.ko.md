@@ -1,10 +1,11 @@
 ---
-title: "BLE_안테나_정합과_최적화_기술자료"
+title: "BLE 안테나 정합과 RF 회로 최적화 실무 기술자료"
 description: "BLE 안테나 정합과 최적화의 모든 것 초보자를 위한 PCB 설계 오류부터 VNA 튜닝 완벽 가이드 그림 1. BLE 안테나 시스템 개요 — 50Ω 임피던스 매칭 경로와 불량 설계 비교 보이지 않는 파이프라인 (The Invisible Pipeline) RF 신호는 2.4 GHz ..."
 date: 2026-05-15
 lang: "ko"
 tags: ["Hardware", "BLE", "RF", "Embedded"]
 draft: false
+slug: "ble-antenna-matching-optimization"
 ---
 
 # **BLE 안테나 정합과 최적화의 모든 것**

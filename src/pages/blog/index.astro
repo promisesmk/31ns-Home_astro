@@ -37,7 +37,7 @@ const posts = (await getCollection('blog', ({ data }) => !data.draft && data.lan
       ) : (
         <div class="blog-grid">
           {posts.map(post => (
-            <a href={`/blog/${post.id.replace(/^ko\//, '')}/`} class="blog-card">
+            <a href={`/blog/${post.data.slug}/`} class="blog-card">
               <div class="blog-card-meta">
                 <span><i class="fas fa-calendar-alt" style="margin-right:4px;color:var(--gold-primary)"></i>
                   {post.data.date.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' })}

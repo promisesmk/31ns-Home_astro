@@ -1,10 +1,11 @@
 ---
-title: "nRF52805 BLE module development technology reference document image included"
+title: "nRF52805 BLE Module Circuit Design and Hardware Reference Guide"
 description: "nRF52805 BLE module development technology reference document (for developers) GX805 / GX805C Series · Nordic Semiconductor nRF52805 WLCSP ⚠ Information on anonymizing sensitive information: The company name, person name, contact information, etc. in the original are [client company], [director in charge A], [representative B], [person in charge..."
 date: 2026-05-14
 lang: "en"
 tags: ["Hardware", "BLE", "RF", "Embedded"]
 draft: false
+slug: "en/nrf52805-ble-module-development"
 ---
 
 **nRF52805 BLE module development**Technical Reference Document (for developers)*GX805 / GX805C Series · Nordic Semiconductor nRF52805 WLCSP*

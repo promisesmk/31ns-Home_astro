@@ -1,10 +1,11 @@
 ---
-title: "BLE antenna matching and optimization technical data"
+title: "BLE Antenna Impedance Matching and RF Optimization Guide"
 description: "Everything about BLE antenna matching and optimization A complete guide to VNA tuning from PCB design errors for beginners Figure 1. BLE antenna system overview — 50Ω impedance matching path compared to poor design The Invisible Pipeline RF signal is 2.4 GHz..."
 date: 2026-05-15
 lang: "en"
 tags: ["Hardware", "BLE", "RF", "Embedded"]
 draft: false
+slug: "en/ble-antenna-matching-optimization"
 ---
 
 # **Everything about BLE antenna matching and optimization**

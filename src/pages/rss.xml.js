@@ -15,7 +15,7 @@ export async function GET(context) {
       title: post.data.title,
       pubDate: post.data.date,
       description: post.data.description,
-      link: post.data.lang === 'en' ? `/en/blog/${post.id}/` : `/blog/${post.id}/`,
+      link: post.data.lang === 'en' ? `/en/blog/${post.data.slug.replace(/^en\//, '')}/` : `/blog/${post.data.slug}/`,
     })),
     customData: `<language>ko-kr</language>`,
   });
