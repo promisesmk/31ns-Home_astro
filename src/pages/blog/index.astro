@@ -20,8 +20,45 @@ const posts = (await getCollection('blog', ({ data }) => !data.draft && data.lan
     </div>
   </section>
 
+  <style>
+    .faq-banner-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      padding: 24px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      color: var(--gold-primary);
+      text-decoration: none;
+      transition: all 0.25s ease;
+      margin-bottom: 32px;
+    }
+    .faq-banner-btn:hover {
+      border-color: var(--gold-primary);
+      background: var(--gold-glow);
+      box-shadow: 0 0 20px rgba(255, 221, 124, 0.15);
+      transform: translateY(-2px);
+    }
+    .faq-banner-btn i.fa-arrow-right {
+      transition: transform 0.2s ease;
+    }
+    .faq-banner-btn:hover i.fa-arrow-right {
+      transform: translateX(6px);
+    }
+  </style>
+
   <section class="section">
     <div class="container">
+      <!-- FAQ Link Banner -->
+      <a href="/rf-faq/" class="faq-banner-btn">
+        <i class="fas fa-database" style="font-size: 1.4rem;"></i>
+        <span style="font-family: var(--font-mono); font-size: 1.15rem; font-weight: bold; letter-spacing: 2px;">
+          RF 실무 Q&A 보기
+        </span>
+        <i class="fas fa-arrow-right" style="font-size: 0.95rem;"></i>
+      </a>
+
       {posts.length === 0 ? (
         <div class="data-module">
           <div class="data-module-header">
