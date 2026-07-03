@@ -3,7 +3,8 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
 
 const faqs = await getCollection('faq');
-const sortedFaqs = faqs.sort((a, b) => a.id.localeCompare(b.id));
+const koreanFaqs = faqs.filter(faq => faq.data.lang === 'ko');
+const sortedFaqs = koreanFaqs.sort((a, b) => a.id.localeCompare(b.id));
 
 // Generate dynamic FAQpage schema for the main hub page too
 const faqSchema = {
