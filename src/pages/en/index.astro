@@ -56,23 +56,25 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
           </div>
         </div>
 
-        <div class="hero-video">
-          <div class="video-terminal" style="width:190px;">
+        <div class="hero-video" style="flex-wrap: wrap; gap: 16px;">
+          <!-- Left Video Terminal -->
+          <div class="video-terminal" style="flex: 1 1 300px; max-width: 400px; width: 100%;">
             <div class="video-terminal-header">
-              <span>MECH_FEED</span>
+              <span>MONITOR_FEED</span>
               <div class="vid-status"><span class="status-dot"></span> LIVE</div>
             </div>
-            <div class="video-wrapper">
-              <video src="/assets/mech_feed.mp4" autoplay loop muted playsinline></video>
+            <div class="video-wrapper" style="aspect-ratio: 16 / 9;">
+              <video src="/assets/monitor_feed.mp4" autoplay loop muted playsinline></video>
             </div>
           </div>
-          <div class="video-terminal" style="width:190px;">
+          <!-- Right Video Terminal -->
+          <div class="video-terminal" style="flex: 1 1 300px; max-width: 400px; width: 100%;">
             <div class="video-terminal-header">
-              <span>VIBE_FEED</span>
+              <span>BOARD_FEED</span>
               <div class="vid-status"><span class="status-dot"></span> LIVE</div>
             </div>
-            <div class="video-wrapper">
-              <video src="/assets/vibe_feed.mp4" autoplay loop muted playsinline></video>
+            <div class="video-wrapper" style="aspect-ratio: 16 / 9;">
+              <video src="/assets/board_feed.mp4" autoplay loop muted playsinline></video>
             </div>
           </div>
         </div>
