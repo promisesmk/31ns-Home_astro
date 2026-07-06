@@ -22,6 +22,30 @@ const backHref = lang === 'en' ? '/en/blog' : '/blog';
 const backLabel = lang === 'en' ? '← Back to Blog' : '← 블로그 목록';
 
 const pageTitle = `${title} | 31NS-Tech Blog`;
+
+const blogSchema = {
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": title,
+  "description": description,
+  "datePublished": date.toISOString(),
+  "author": {
+    "@type": "Organization",
+    "name": "31NS-Tech"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "31NS-Tech",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://31ns.kr/assets/Logo%2031NS-Tech.jpg"
+    }
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": new URL(Astro.url.pathname, Astro.site).href
+  }
+};
 ---
 
 <BaseLayout 
@@ -31,6 +55,9 @@ const pageTitle = `${title} | 31NS-Tech Blog`;
   alternateKo={alternateKo}
   alternateEn={alternateEn}
 >
+  <!-- Inject BlogPosting JSON-LD Schema for Google SEO -->
+  <script type="application/ld+json" is:raw set:html={JSON.stringify(blogSchema)} />
+
   <section class="hero" style="padding: 100px 0 48px;">
     <div class="container">
       <div class="hero-label">// TECH_BLOG — {lang.toUpperCase()}</div>

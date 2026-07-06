@@ -8,17 +8,19 @@ draft: false
 slug: "en/ble-antenna-matching-optimization"
 ---
 
-# **Everything about BLE antenna matching and optimization**
+## **Everything about BLE antenna matching and optimization**
 
 Complete guide to VNA tuning from PCB design errors for beginners
 
 <img src="https://cdn.jsdelivr.net/gh/promisesmk/31ns-Home-blog-assets@main/BLE_안테나_정합과_최적화_기술자료/img_01.webp" width="1200" height="669" loading="lazy" alt="Blog Image" />
 
-*Figure 1\. BLE Antenna System Overview — 50Ω Impedance Matched Path Versus Bad Design*# **The Invisible Pipeline**
+*Figure 1\. BLE Antenna System Overview — 50Ω Impedance Matched Path Versus Bad Design*
+
+## **The Invisible Pipeline**
 
 RF signals are sensitive energies that oscillate at 2\.4 GHz (wavelength approximately 12\.5 cm).
 
-## **The Danger of Reflection**
+### **The Danger of Reflection**
 
 If the chipset, pattern, and antenna do not all meet the standard of '50 ohms (Ω)', the energy cannot be radiated and is reflected back to the chip, reducing the reception distance and causing heat generation. (Increased VSWR and Return Loss)
 
@@ -27,10 +29,10 @@ If the chipset, pattern, and antenna do not all meet the standard of '50 ohms (�
 *Figure 2\. Comparison of matched state (Matched 50Ω) vs. impedance mismatched (Mismatched)*# **Find the antenna that’s right for you**##**Inverted\-F (IFA) — Inverted F pattern antenna*** Space: 15 × 25 mm* Efficiency: 70% \~ 80%
 *Cost: Zero (no additional parts)* Most recommended standard method (smart sensor, beacon)
 
-## **Ceramic Chip — Ceramic Chip Antenna*** Space: 3 × 2 mm* Efficiency: 20% \~ 50%
+### **Ceramic Chip — Ceramic Chip Antenna*** Space: 3 × 2 mm* Efficiency: 20% \~ 50%
 *Cost: Medium* Suitable for ultra-small wearable devices, but low efficiency
 
-## **Wire \& Monopole — External whip antenna*** Space: 31 mm length* Efficiency: 80% \~ 90%
+### **Wire \& Monopole — External whip antenna*** Space: 31 mm length* Efficiency: 80% \~ 90%
 *Cost: Low* Ideal for high-performance industrial equipment without space constraints
 
 <img src="https://cdn.jsdelivr.net/gh/promisesmk/31ns-Home-blog-assets@main/BLE_안테나_정합과_최적화_기술자료/img_03.webp" width="1200" height="669" loading="lazy" alt="Blog Image" />
@@ -39,7 +41,7 @@ If the chipset, pattern, and antenna do not all meet the standard of '50 ohms (�
 
 We dissect the critical design errors that destroy RF performance.
 
-## **Major Design Error Types*** Antenna Placement Error: Antenna placed inside the board or placed close to metal parts* Wiring and accessibility errors (Routing \& Access): RF wiring not maintaining 50Ω impedance
+### **Major Design Error Types*** Antenna Placement Error: Antenna placed inside the board or placed close to metal parts* Wiring and accessibility errors (Routing \& Access): RF wiring not maintaining 50Ω impedance
 * Noise Coupling: Place high-noise elements such as switching regulators near the RF path.
 
 <img src="https://cdn.jsdelivr.net/gh/promisesmk/31ns-Home-blog-assets@main/BLE_안테나_정합과_최적화_기술자료/img_04.webp" width="1200" height="669" loading="lazy" alt="Blog Image" />
@@ -66,7 +68,7 @@ CPWG (Coplanar Waveguide with Ground) method is advantageous in blocking noise.
 
 A Pi\-Network type matching network pad is required between the BLE SoC output and the antenna.
 
-## **Notes on component selection*** Self-resonant frequency (SRF) must be over 3 GHz* The capacitor uses a C0G (NP0\) dielectric that is resistant to temperature changes.
+### **Notes on component selection*** Self-resonant frequency (SRF) must be over 3 GHz* The capacitor uses a C0G (NP0\) dielectric that is resistant to temperature changes.
 * Inductor uses High\-Q Wirewound type to minimize insertion loss
 
 <img src="https://cdn.jsdelivr.net/gh/promisesmk/31ns-Home-blog-assets@main/BLE_안테나_정합과_최적화_기술자료/img_07.webp" width="1200" height="669" loading="lazy" alt="Blog Image" />
@@ -109,14 +111,14 @@ The exact center of the chart (50 ohms) is the perfect match we need to achieve.
 
 The inductor (L) and capacitor (C) act as arrow keys on the Smith chart. Use the simulator to find the optimal component combination and place it in the center.
 
-## **Direction of movement of Smith chart by component*** Parallel inductor (Shunt L): counterclockwise top movement* Series inductor (Series L): clockwise upward movement
+### **Direction of movement of Smith chart by component*** Parallel inductor (Shunt L): counterclockwise top movement* Series inductor (Series L): clockwise upward movement
 *Parallel capacitor (Shunt C): clockwise downward movement* Series Capacitor (Series C): Move bottom counterclockwise
 
 <img src="https://cdn.jsdelivr.net/gh/promisesmk/31ns-Home-blog-assets@main/BLE_안테나_정합과_최적화_기술자료/img_12.webp" width="1200" height="669" loading="lazy" alt="Blog Image" />
 
 *Figure 12\. Smith Chart Component Navigation — L/C combination to reach 50Ω center*# **Enclosure Detuning*** The plastic case acts as a dielectric and lowers the antenna's resonant frequency by about 50\~100 MHz (Detuning).* Be sure to perform VNA measurements with the actual production case on, and if necessary, trim the ends of the antenna pattern and raise the frequency.
 
-## **Bare PCB vs Encased PCB Comparison*** Bare PCB: 2\.44 GHz — Ideal Resonance* Encased PCB: 2\.35 GHz — Detuning occurs, correction required by trimming
+### **Bare PCB vs Encased PCB Comparison*** Bare PCB: 2\.44 GHz — Ideal Resonance* Encased PCB: 2\.35 GHz — Detuning occurs, correction required by trimming
 
 <img src="https://cdn.jsdelivr.net/gh/promisesmk/31ns-Home-blog-assets@main/BLE_안테나_정합과_최적화_기술자료/img_13.webp" width="1200" height="669" loading="lazy" alt="Blog Image" />
 
@@ -124,13 +126,13 @@ The inductor (L) and capacitor (C) act as arrow keys on the Smith chart. Use the
 
 If you follow these rules, you can more than double the communication distance.
 
-## **Layout (Design)*** Antenna is placed at the edge of the board* Securing perfect separation area (keep\-out) up, down, left and right
+### **Layout (Design)*** Antenna is placed at the edge of the board* Securing perfect separation area (keep\-out) up, down, left and right
 * Maintain calculated impedance 50Ω RF pattern
 
-## **Hardware*** U.FL connector must be added for debugging* Secure 3 0402 pads for Pi\-matching network
+### **Hardware*** U.FL connector must be added for debugging* Secure 3 0402 pads for Pi\-matching network
 * Continuous ground of at least 25 × 35 mm
 
-## **Tuning*** VNA cable phase delay compensation (Port Extension)* 50Ω matching using Smith chart
+### **Tuning*** VNA cable phase delay compensation (Port Extension)* 50Ω matching using Smith chart
 * Be sure to measure with the final equipment (enclosure) on
 
 <img src="https://cdn.jsdelivr.net/gh/promisesmk/31ns-Home-blog-assets@main/BLE_안테나_정합과_최적화_기술자료/img_14.webp" width="1200" height="669" loading="lazy" alt="Blog Image" />
