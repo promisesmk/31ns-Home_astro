@@ -6,7 +6,11 @@ import sitemap from '@astrojs/sitemap';
 
 export default defineConfig({
   site: 'https://31ns.kr',
-  integrations: [sitemap()],
+  integrations: [
+    sitemap({
+      filter: (page) => !page.includes('.html'),
+    }),
+  ],
   trailingSlash: 'always',
   build: {
     format: 'directory',
